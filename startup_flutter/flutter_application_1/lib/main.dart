@@ -1,119 +1,169 @@
-import 'package:flutter/material.dart';
-import 'package:english_words/english_words.dart';
 
-void main() => runApp(MyApp());
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show debugPaintSizeEnabled;
+
+void main() {
+  debugPaintSizeEnabled = false; // Set to true for visual layout
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Farhad Name Generator',
-       theme: ThemeData(
-        primaryColor: Colors.white,
-        ),            
-      home: RandomWords(),
-      
+      title: 'Flutter layout demo',
+      home: buildHomePage('Strawberry Pavlova Recipe'),
     );
   }
-}
 
-
-class RandomWords extends StatefulWidget {
-  @override
-  _RandomWordsState createState() => _RandomWordsState();
-}
-
-class _RandomWordsState extends State<RandomWords> {
-
-  final _suggestions = <WordPair>[];
-  final _saved = <WordPair>{};
-  final _biggerFont = TextStyle(fontSize: 18.0);
-
-  @override
-    Widget build(BuildContext context) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Farhad Name Generator',style: TextStyle(color: Colors.white, fontStyle: FontStyle.italic)),
-          backgroundColor:Colors.black,
-          actions: [
-          IconButton(icon: Icon(Icons.list,color: Colors.white), onPressed: _pushSaved),
-        ],
+  Widget buildHomePage(String title) {
+    final titleText = Container(
+      padding: EdgeInsets.all(20),
+      child: Text(
+        'Strawberry Pavlova',
+        style: TextStyle(
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.5,
+          fontSize: 30,
         ),
-        body: _buildSuggestions(),
-      );
-    }
-
-    Widget _buildSuggestions() {
-      return ListView.builder(
-          padding: EdgeInsets.all(16.0),
-          itemBuilder: /*1*/ (context, i) {
-            if (i.isOdd) return Divider(); /*2*/
-
-            final index = i ~/ 2; /*3*/
-            if (index >= _suggestions.length) {
-              _suggestions.addAll(generateWordPairs().take(10)); /*4*/
-            }
-            return _buildRow(_suggestions[index]);
-          });
-    }
-
-    Widget _buildRow(WordPair pair) {
-
-      final alreadySaved = _saved.contains(pair);
-      return ListTile(
-        title: Text(
-          pair.asPascalCase,
-          style: _biggerFont,
-        ),
-        trailing: Icon(   // NEW from here... 
-          alreadySaved ? Icons.favorite : Icons.favorite_border,
-          color: alreadySaved ? Colors.red : null,
-        ), 
-        onTap: () {      // NEW lines from here...
-          setState(() {
-            if (alreadySaved) {
-              _saved.remove(pair);
-            } else { 
-              _saved.add(pair); 
-            } 
-            });
-        }, 
-      );
-    }
-    void _pushSaved() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        // NEW lines from here...
-        builder: (BuildContext context) {
-          final tiles = _saved.map(
-            (WordPair pair) {
-              return ListTile(
-                title: Text(
-                  pair.asPascalCase,
-                  style: _biggerFont,
-                ),
-              );
-            },
-          );
-          final divided = ListTile.divideTiles(
-            context: context,
-            tiles: tiles,
-          ).toList();
-
-          return Scaffold(
-            appBar: AppBar(
-              title: Text('Saved Suggestions',style: TextStyle(color: Colors.white, fontStyle: FontStyle.italic)),
-              backgroundColor:Colors.black,
-              iconTheme: IconThemeData(
-                color: Colors.white, //change your color here
-              ),
-            ),
-            body: ListView(children: divided),
-          );
-        }, // ...to here.
       ),
+    );
+
+    final subTitle = Text(
+      'Pavlova is a meringue-based dessert named after the Russian ballerina '
+      'Anna Pavlova. Pavlova features a crisp crust and soft, light inside, '
+      'topped with fruit and whipped cream.',
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontFamily: 'Georgia',
+        fontSize: 25,
+      ),
+    );
+
+    // #docregion ratings, stars
+    var stars = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.star, color: Colors.green[500]),
+        Icon(Icons.star, color: Colors.green[500]),
+        Icon(Icons.star, color: Colors.green[500]),
+        Icon(Icons.star, color: Colors.black),
+        Icon(Icons.star, color: Colors.black),
+      ],
+    );
+    // #enddocregion stars
+
+    final ratings = Container(
+      padding: EdgeInsets.all(20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          stars,
+          Text(
+            '170 Reviews',
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w800,
+              fontFamily: 'Roboto',
+              letterSpacing: 0.5,
+              fontSize: 20,
+            ),
+          ),
+        ],
+      ),
+    );
+    // #enddocregion ratings
+
+    // #docregion iconList
+    final descTextStyle = TextStyle(
+      color: Colors.black,
+      fontWeight: FontWeight.w800,
+      fontFamily: 'Roboto',
+      letterSpacing: 0.5,
+      fontSize: 18,
+      height: 2,
+    );
+
+    // DefaultTextStyle.merge() allows you to create a default text
+    // style that is inherited by its child and all subsequent children.
+    final iconList = DefaultTextStyle.merge(
+      style: descTextStyle,
+      child: Container(
+        padding: EdgeInsets.all(20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Column(
+              children: [
+                Icon(Icons.kitchen, color: Colors.green[500]),
+                Text('PREP:'),
+                Text('25 min'),
+              ],
+            ),
+            Column(
+              children: [
+                Icon(Icons.timer, color: Colors.green[500]),
+                Text('COOK:'),
+                Text('1 hr'),
+              ],
+            ),
+            Column(
+              children: [
+                Icon(Icons.restaurant, color: Colors.green[500]),
+                Text('FEEDS:'),
+                Text('4-6'),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+    // #enddocregion iconList
+
+    // #docregion leftColumn
+    final leftColumn = Container(
+      padding: EdgeInsets.fromLTRB(20, 30, 20, 20),
+      child: Column(
+        children: [
+          titleText,
+          subTitle,
+          ratings,
+          iconList,
+        ],
+      ),
+    );
+    // #enddocregion leftColumn
+
+    final mainImage = Image.asset(
+      'images/pavlova.jpg',
+      fit: BoxFit.cover,
+    );
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+      ),
+      // #docregion body
+      body: Center(
+        child: Container(
+          margin: EdgeInsets.fromLTRB(0, 40, 0, 30),
+          height: 600,
+          child: Card(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 440,
+                  child: leftColumn,
+                ),
+                mainImage,
+              ],
+            ),
+          ),
+        ),
+      ),
+      // #enddocregion body
     );
   }
 }
